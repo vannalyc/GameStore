@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Game Store</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Video Games</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="./boardGames.html">Board Games</a></li>
+      
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="video-games">
+      <div class="game-list"></div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2023 Video Game Store</p>
+  </footer>
+  
+  <script>
+    async function fetchVideoGames() {
+      const response = await fetch('/api/video-games');
+      const videoGames = await response.json();
+      return videoGames;
+    }
+
+    async function createGameCards() {
+      const videoGames = await fetchVideoGames();
+      const gameList = document.querySelector('.game-list');
+
+      videoGames.forEach(videoGame => {
+        const gameCard = document.createElement('div');
+        gameCard.classList.add('game-card');
+
+        const image = document.createElement('img');
+        image.src = videoGame.imgUrl;
+        image.alt = videoGame.name;
+
+        const title = document.createElement('h3');
+        title.textContent = videoGame.name;
+
+        const description = document.createElement('p');
+        description.textContent = videoGame.description;
+
+        gameCard.appendChild(image);
+        gameCard.appendChild(title);
+        gameCard.appendChild(description);
+
+        gameList.appendChild(gameCard);
+      });
+    }
+
+    createGameCards();
+  </script>
+</body>
+</html>

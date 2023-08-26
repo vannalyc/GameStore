@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Game Store</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Video Games</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="./videoGames.html">Video Games</a></li>
+        <li><a href="./boardGames.html">Board Games</a></li>
+
+      </ul>
+    </nav>
+  </header>
+  <main>
+      <section class="video-games">
+        <div class="game-list"></div> 
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2023 Video Game Store</p>
+
+    <script>
+        async function fetchVideoGames() {
+          const response = await fetch('/api/video-games'); 
+          const videoGames = await response.json();
+          return videoGames;
+        }
+      
+        async function createGameCards() {
+          const videoGames = await fetchVideoGames();
+          const gameList = document.querySelector('.game-list');
+      
+          videoGames.forEach(videoGame => {
+            const gameCard = document.createElement('div');
+            gameCard.classList.add('game-card');
+      
+            const image = document.createElement('img');
+            image.src = videoGame.imgUrl;
+            image.alt = videoGame.name;
+      
+            const title = document.createElement('h3');
+            title.textContent = videoGame.name;
+      
+            const description = document.createElement('p');
+            description.textContent = videoGame.description;
+      
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => handleEditClick(videoGame.id));
+      
+            gameCard.appendChild(image);
+            gameCard.appendChild(title);
+            gameCard.appendChild(description);
+            gameCard.appendChild(editButton);
+      
+            gameList.appendChild(gameCard);
+          });
+        }
+        async function handleEditClick(videoGameId) {
+            console.log('Edit button clicked for game with ID', videoGameId);
+            const gameCard = document.querySelector(`[data-id="${videoGameId}"]`);
+            if (!gameCard) return;
+        
+            const existingInput = gameCard.querySelector('.edit-input');
+            if (existingInput) return;
+        
+            const nameElement = gameCard.querySelector('.game-name');
+            const descriptionElement = gameCard.querySelector('.game-description');
+        
+            const editNameInput = document.createElement('input');
+            editNameInput.classList.add('edit-input');
+            editNameInput.type = 'text';
+            editNameInput.value = nameElement.textContent;
+        
+            const editDescriptionInput = document.createElement('textarea');
+            editDescriptionInput.classList.add('edit-input');
+            editDescriptionInput.value = descriptionElement.textContent;
+        
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.addEventListener('click', () => handleSaveClick(videoGameId, editNameInput.value, editDescriptionInput.value));
+        
+            
+            gameCard.replaceChild(editNameInput, nameElement);
+            gameCard.replaceChild(editDescriptionInput, descriptionElement);
+            gameCard.appendChild(saveButton);
+        }
+          
+        async function handleSaveClick(videoGameId, newName, newDescription) {
+            try {
+             
+        
+                const response = await fetch(`/api/video-games/${videoGameId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: newName,
+                        description: newDescription
+                    })
+                });
+        
+              
+        
+            } catch (error) {
+                console.error(`An error occurred while updating game with ID ${videoGameId}.`, error);
+            }
+        }
+        
+
+            createGameCards();
+        
+        
+      </script>
+      
+  </footer>
+</body>
+</html>
